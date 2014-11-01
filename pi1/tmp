@@ -1,0 +1,427 @@
+<?php
+/***************************************************************
+*  Copyright notice
+*
+*  (c) 2007 Georg Ringer <http://www.just2b.com>
+*  All rights reserved
+*
+*  This script is part of the TYPO3 project. The TYPO3 project is
+*  free software; you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation; either version 2 of the License, or
+*  (at your option) any later version.
+*
+*  The GNU General Public License can be found at
+*  http://www.gnu.org/copyleft/gpl.html.
+*
+*  This script is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*
+*  This copyright notice MUST APPEAR in all copies of the script!
+***************************************************************/
+
+require_once(PATH_tslib.'class.tslib_pibase.php');
+
+
+/**
+ * Plugin 'SmoothGallery' for the 'rgsmoothgallery' extension.
+ *
+ * @author	Georg Ringer <http://www.just2b.com>
+ * @package	TYPO3
+ * @subpackage	tx_rgsmoothgallery
+ */
+class tx_rgsmoothgallery_pi1 extends tslib_pibase {
+	var $prefixId      = 'tx_rgsmoothgallery_pi1';		// Same as class name
+	var $scriptRelPath = 'pi1/class.tx_rgsmoothgallery_pi1.php';	// Path to this script relative to the extension dir.
+	var $extKey        = 'rgsmoothgallery';	// The extension key.
+	var $pi_checkCHash = true;
+
+	/**
+	 * Just some intialization, mainly reading the settings in the flexforms
+	 *
+	 * @param	array		$conf: The PlugIn configuration
+	 */	
+	function init($conf) {
+    $this->conf = $conf; // Storing configuration as a member var
+		$this->pi_loadLL(); // Loading language-labels
+		$this->pi_setPiVarDefaults(); // Set default piVars from TS
+		$this->pi_initPIflexForm(); // Init FlexForm configuration for plugin
+		
+		// Template code
+		$this->templateCode = $this->cObj->fileResource($this->conf['templateFile']);
+
+		// configuration flexforms
+    $this->config['mode'] =  $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'mode', 'sDEF') ? $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'mode', 'sDEF') : $this->conf['mode'];
+		$this->config['duration'] =  $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'time', 'sDEF') ? $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'time', 'sDEF') : $this->conf['duration'];
+		$this->config['startingpoint'] =  $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'startingpoint', 'sDEF') ? $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'startingpoint', 'sDEF') : $this->conf['startingpoint'];		
+		$this->conf['startingpointrecords'] = $this->conf['startingpointrecords'] ? $this->conf['startingpointrecords'] : $GLOBALS['TSFE']->id;		
+		$this->config['startingpointrecords'] =  $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'startingpointrecords', 'sDEF') ? $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'startingpointrecords', 'sDEF') : ($this->conf['startingpointrecords']);
+		$this->config['startingpointdam'] =  $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'startingpointdam', 'sDEF') ;
+    $this->config['text'] =  $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'text', 'sDEF') ? $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'text', 'sDEF') : $this->conf['text'];
+		$this->config['showLightbox'] =  $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'lightbox', 'sDEF') ? $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'lightbox', 'sDEF') : $this->conf['lightbox'];
+		$this->config['showThumbs'] =  $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'showThumbs', 'sDEF') ? $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'showThumbs', 'sDEF') : $this->conf['showThumbs'];		
+		$this->config['showArrows'] =  $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'arrows', 'sDEF') ? $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'arrows', 'sDEF') : $this->conf['arrows'];
+		$this->config['advancedSettings'] =  $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'advancedsettings', 'sDEF') ? $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'advancedsettings', 'sDEF') : $this->conf['advancedSettings'];    
+
+    // size of images, overwritten by flexforms
+    $this->config['width'] = ($this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'width', 'sDEF')) ? $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'width', 'sDEF') : $this->conf['big.']['file.']['maxW'] ;
+    if ($this->config['width'])  $this->conf['big.']['file.']['maxW'] = $this->config['width'];
+    $this->config['height'] = ($this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'height', 'sDEF')) ? $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'height', 'sDEF') : $this->conf['big.']['file.']['maxH'];
+    if ($this->config['height']) $this->conf['big.']['file.']['maxH'] = $this->config['height'];
+  }
+	
+	/**
+	 * The main method of the PlugIn
+	 * for showing the SmoothGallery	 
+	 *
+	 * @param	string		$content: The PlugIn content
+	 * @param	array		$conf: The PlugIn configuration
+	 * @return	The gallery
+	 */
+	function main($content,$conf)	{
+		global $TYPO3_DB;
+    $this->init($conf);	
+		$this->pi_setPiVarDefaults();
+		$this->pi_loadLL();
+		$this->pi_USER_INT_obj=0;	// Configuring so caching is expected. 
+		$this->pi_initPIflexForm(); // Init FlexForm configuration for plugin
+
+    // get the needed js to load the gallery and to start it
+    $content .= $this->getJs(
+      $this->config['showLightbox'], 
+      $this->config['showThumbs'],
+      $this->config['showArrows'],
+      $this->config['duration'],
+      $this->config['width'],      
+      $this->config['height'], 
+      $this->config['advancedSettings'],     
+      $this->cObj->data['uid'],
+      $this->conf
+    );
+  	
+  	// depending on the choosen settings the images come from differnt places
+  	/*
+  	*  get the images out of a directory
+  	*/  	
+  	if ($this->config['mode']=='DIRECTORY') {
+  		// read all the images
+  		$i = 0;
+      if (is_dir($this->config['startingpoint'])) {
+  		  $images = (array) $this->getFiles($this->config['startingpoint']);
+
+        // read the description from field in flexforms
+      	$caption = explode("\n",$this->config['text']);
+    
+        $content.= $this->beginGallery($this->cObj->data['uid']);
+        
+        // add the images
+        foreach ($images as $key=>$value) {
+          $path = $this->config['startingpoint'].$value;
+          // single Image
+          $imgTSConfigThumb = $this->conf['thumb.'];
+          $imgTSConfigThumb['file'] = $path;
+          $imgTSConfigBig = $this->conf['big.'];
+          $imgTSConfigBig['file'] = $path;        
+          $imgTSConfigLightbox = $this->conf['lightbox.'];
+          $imgTSConfigLightbox['file'] = $path;        
+          $lightbox = ($this->config['showLightbox']==1) ? $this->cObj->IMG_RESOURCE($imgTSConfigLightbox) : '#';
+         
+          // caption text
+          $text =explode('|',$caption[$i]);
+          
+          // add image
+  				$content.=$this->addImage($text[0], $text[1], $this->cObj->IMG_RESOURCE($imgTSConfigThumb),$this->cObj->IMG_RESOURCE($imgTSConfigBig),$lightbox);
+        
+        	$i++;
+        } # end foreach file
+        
+  		  $content.=$this->endGallery();
+  		} # end is_dir
+
+  	/*
+  	*  get the images out of records a user created in the backend before
+  	*/    		
+  	} elseif ($this->config['mode']=='RECORDS') {
+  		//prepare query
+  		$sort = 'sorting';
+  		$fields = 'title,image,description,l18n_parent';
+  		$tables = 'tx_rgsmoothgallery_image';
+  		$temp_where='pid IN ('. $this->config['startingpointrecords'] . ') AND hidden=0 AND deleted=0 AND sys_language_uid = '.$GLOBALS['TSFE']->sys_language_content;
+  	
+      $content.=$this->beginGallery($this->cObj->data['uid']);
+      
+      // add the images
+  		$res = $TYPO3_DB->exec_SELECTquery($fields, $tables, $temp_where,'', $sort,$limit);
+  		$this->sys_language_mode = $this->conf['sys_language_mode']?$this->conf['sys_language_mode'] : $GLOBALS['TSFE']->sys_language_mode;
+  		while($row = $TYPO3_DB->sql_fetch_assoc($res)) {
+    	  
+      	if ($GLOBALS['TSFE']->sys_language_content) {
+    				$OLmode = ($this->sys_language_mode == 'strict' ? 'hideNonTranslated' : '');
+    			$row = $GLOBALS['TSFE']->sys_page->getRecordOverlay('tx_rgsmoothgallery_image',$row, $GLOBALS['TSFE']->sys_language_content, $OLmode);
+    	#		t3lib_div::debug($row,'strict');
+    		}  	
+
+        if ($row['image']=='') {
+          $res2 = $TYPO3_DB->exec_SELECTquery('image', $tables, 'uid='.$row['l18n_parent']);
+          $row2 = $TYPO3_DB->sql_fetch_assoc($res2);  
+          $row['image'] = $row2['image'];   
+        }	
+     
+    #   echo t3lib_div::view_array($row);
+        $path = 'uploads/tx_rgsmoothgallery/'.$row['image'];
+        // single Image
+        $imgTSConfigThumb = $this->conf['thumb.'];
+        $imgTSConfigThumb['file'] = $path;
+        $imgTSConfigBig = $this->conf['big.'];
+        $imgTSConfigBig['file'] = $path;        
+        $imgTSConfigLightbox = $this->conf['lightbox.'];
+        $imgTSConfigLightbox['file'] = $path;        
+        $lightbox = ($this->config['showLightbox']==1) ? $this->cObj->IMG_RESOURCE($imgTSConfigLightbox) : '#';
+       
+        // caption text
+        $text =explode('|',$caption[$i]);
+        
+        // add image
+				$content.=$this->addImage($row['title'], $row['description'], $this->cObj->IMG_RESOURCE($imgTSConfigThumb),$this->cObj->IMG_RESOURCE($imgTSConfigBig),$lightbox);
+      
+      	$i++;
+      } # end foreach file
+      
+		  $content.=$this->endGallery();
+   
+  	/*
+  	*  get the images out of DAM
+  	*/        
+    } elseif ($this->config['mode']=='DAM') {
+      #  echo t3lib_div::view_array($images);
+      
+      // get all the files
+      $images = tx_dam_db::getReferencedFiles('tt_content',$this->cObj->data['uid'],'rgsmoothgallery','tx_dam_mm_ref');
+
+  	  $content.=$this->beginGallery($this->cObj->data['uid']);
+  	  
+  	  // add image
+      foreach ($images['files'] as $key=>$path) {
+        $imgTSConfigThumb = $this->conf['thumb.'];
+        $imgTSConfigThumb['file'] = $path;
+        $imgTSConfigBig = $this->conf['big.'];
+        $imgTSConfigBig['file'] = $path;        
+        $imgTSConfigLightbox = $this->conf['lightbox.'];
+        $imgTSConfigLightbox['file'] = $path;        
+        $lightbox = ($this->config['showLightbox']==1) ? $this->cObj->IMG_RESOURCE($imgTSConfigLightbox) : '#';
+
+        // get data from the single image
+        $fields = 'title,description';
+        $tables = 'tx_dam';
+        $temp_where='uid = '.$key;
+        $res = $TYPO3_DB->exec_SELECTquery($fields, $tables, $temp_where);
+        $row = $TYPO3_DB->sql_fetch_assoc($res);
+
+        // add image
+				$content.=$this->addImage($row['title'], $row['description'], $this->cObj->IMG_RESOURCE($imgTSConfigThumb),$this->cObj->IMG_RESOURCE($imgTSConfigBig),$lightbox);
+      }
+      
+      $content.=$this->endGallery();
+    }	
+  		
+	
+		return $this->pi_wrapInBaseClass($content);
+	} # end main
+
+	/**
+	 * Just some divs needed for the gallery
+	 *
+	 * @param	string/int   $uniqueId: A unique ID to have more than 1 galleries on 1 page
+	 * @return	The opened divs
+	 */	
+	function beginGallery($uniqueId) {
+    return '<div class="content"><div class="myGallery" id="myGallery'.$uniqueId.'">';
+  }
+
+	/**
+	 * Just some divs needed for the gallery
+	 *
+	 * @return	The closed divs
+	 */	  
+  function endGallery() {
+    return '</div></div>';
+  }
+
+	/**
+	 * Loads all the needed javascript stuff and 
+	 * does the configuration of the gallery	 	 
+	 *
+	 * @param	boolean  $lightboxVal: Lightbox activated=
+	 * @param	boolean  $thumbsVal: Thumbnail preview activated?
+	 * @param	boolean  $arrowsVal: Arrows to neighbour images activated?
+	 * @param	string   $durationVal: If automatic slideshow the value of the delay
+	 * @param	int      $width: Width of gallery	 
+   * @param	int      $height: Height of gallery
+	 * @param	string   $advancedSettings: Advanced configuration
+   * @param	string/int   $uniqueId: A unique ID to have more than 1 galleries on 1 page
+	 * $param array    $conf: $configuration-array	 
+	 * @return	The gallery
+	 */  
+  function getJs($lightboxVal,$thumbsVal,$arrowsVal,$durationVal,$width,$height,$advancedSettings,$uniqueId,$conf,$overrideJS='') {
+    $this->conf =$conf;
+
+    // path to js + css
+		$GLOBALS['TSFE']->additionalHeaderData['rgsmoothgallery'] = '
+        <script src="'.$this->getPath($this->conf['pathToMootools']).'" type="text/javascript"></script>
+        <script src="'.$this->getPath($this->conf['pathToJdgalleryJS']).'" type="text/javascript"></script>
+        <link rel="stylesheet" href="'.$this->getPath($this->conf['pathToJdgalleryCSS']).'" type="text/css" media="screen" />
+      ';
+
+      // slimbox
+      $GLOBALS['TSFE']->additionalHeaderData['rgsmoothgallery'] .= '
+        <script src="'.$this->getPath($this->conf['pathToSlightboxJS']).'" type="text/javascript"></script>
+        <link rel="stylesheet" href="'.$this->getPath($this->conf['pathToSlightboxCSS']).'" type="text/css" media="screen" />
+      ';
+
+    $GLOBALS['TSFE']->additionalCSS['rgsmoothgallery'.$uniqueId] = '#myGallery'.$uniqueId.' {width:'.$width.'px;height:'.$height.'px;}';
+
+    // configuration of gallery
+    $lightbox = ($lightboxVal==1) ? 'true' : 'false';
+    $lightbox2= ($lightboxVal==1) ? 'var mylightbox = new Lightbox();' : '';
+    $duration = ($durationVal) ? 'timed:true,delay: '.$durationVal : 'timed:false';
+    $thumbs   = ($thumbsVal==1) ? 'true' : 'false';
+    $arrows   = ($arrowsVal==1) ? 'true' : 'false';
+    
+    
+    // js needed to load the gallery and to get it started  
+    if ($overrideJS!='') {
+      $js = $overrideJS;
+    } else {
+      $js.= '
+    		<script type="text/javascript">
+    			function startGallery'.$uniqueId.'() {
+    			  if(window.gallery'.$uniqueId.')
+    			    {
+    			    try
+    			      {
+    				    var myGallery'.$uniqueId.' = new gallery($(\'myGallery'.$uniqueId.'\'), {
+    					    '.$duration.',
+    					      showArrows: '.$arrows.',
+                  showCarousel: '.$thumbs.',
+                  textShowCarousel: \''.$this->pi_getLL('textShowCarousel').'\',
+                  embedLinks:'.$lightbox.',
+                  '.$advancedSettings.'
+    					    lightbox:true
+    				    });
+    				    var mylightbox = new Lightbox();
+    				    }catch(error){
+    				    window.setTimeout("startGallery'.$uniqueId.'();",2500);
+    				    }
+    				  }else{
+    				  window.gallery'.$uniqueId.'=true;
+    				  if(this.ie)
+    				    {
+    				    window.setTimeout("startGallery'.$uniqueId.'();",3000);
+    				    }else{
+    				    window.setTimeout("startGallery'.$uniqueId.'();",100);
+    				    }
+    				  }
+    			}
+    			window.onDomReady(startGallery'.$uniqueId.');
+    		</script>';
+    }
+    return $js;
+  }
+
+	/**
+	 * Adds a single image to the gallery 
+	 *
+	 * @param	string  $title: Title for the image
+	 * @param	string  $description: Description for the image
+	 * @param	string  $thumb: Url to the thumbnail image
+	 * @param	string  $large: Url to the large image
+	 * @param	string  $lightbox: Url to the lightbox image
+	 * @return	The single image
+	 */ 	
+	function addImage($title, $description, $thumb,$large,$lightbox) {
+	  // if lightbox not activated, the url will be simply nothing. no '#' because still clickable
+    if ($lightbox=='#' || $lightbox=='') $lightbox='javascript:void(0)';
+    $singleImage .= '
+      <div class="imageElement">
+        <h3>'.$title.'</h3>
+        <p>'.$description.'</p>
+        <a href="'.$lightbox.'" title="open image" class="open"></a>
+        <img src="'.$large.'" class="full" />
+        <img src="'.$thumb.'" class="thumbnail" />
+      </div>';
+    return $singleImage;
+  }
+
+	/**
+	 * Gets all image files out of a directory 
+	 *
+	 * @param	string  $path: Path to the directory
+	 * @return Array with the images
+	 */ 
+  function getFiles($path, $extra = "") {
+    // check for needed slash at the end
+		$length = strlen($path);
+		if ($path{$length-1}!='/') { 
+      $path.='/';
+    }
+    
+    $imagetypes = $this->conf["filetypes"] ? explode(',', $this->conf["filetypes"]) : array(
+        'jpg',
+        'jpeg',
+        'gif',
+        'png'
+    );
+
+    if($dir = dir($path)) {
+        $files = Array();
+
+        while(false !== ($file = $dir->read())) {
+            if ($file != '.' && $file != '..') {
+                $ext = strtolower(substr($file, strrpos($file, '.')+1));
+                if (in_array($ext, $imagetypes)) {
+                    array_push($files, $extra . $file);
+                }
+                else if ($this->conf["recursive"] == '1' && is_dir($path . "/" . $file)) {
+                    $dirfiles = $this->getFiles($path . "/" . $file, $extra . $file . "/");
+                    if (is_array($dirfiles)) {
+                        $files = array_merge($files, $dirfiles);
+                    }
+                }
+            }
+        }
+
+        $dir->close();
+        return $files;
+    }
+  } # end getFiles
+  
+	/**
+	 * Gets the path to a file, needed to translate the 'EXT:extkey' into the real path
+	 *
+	 * @param	string  $path: Path to the file
+	 * @return the real path
+	 */
+  function getPath($path) {
+    if (substr($path,0,4)=='EXT:') {
+      $keyEndPos = strpos($path, '/', 6);
+      $key = substr($path,4,$keyEndPos-4);
+      $keyPath = t3lib_extMgm::siteRelpath($key);
+      $newPath = $keyPath.substr($path,$keyEndPos+1);
+      return $newPath;
+    }	else {
+      return $path;
+    }
+  } # end getPath
+    
+       	
+}
+
+
+
+if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/rgsmoothgallery/pi1/class.tx_rgsmoothgallery_pi1.php'])	{
+	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/rgsmoothgallery/pi1/class.tx_rgsmoothgallery_pi1.php']);
+}
+
+?>

@@ -1,0 +1,54 @@
+This is just a copy of http://www.rggooglemap.com/dev/rgsmoothgallery/history.html
+
+1.5.1
+- [Bug] nl2br for the description, thx to Frank Knud
+- [Bug] allow to change slideInfoZoneOpacity, thx fo Frank Knud
+
+
+ 1.0.6.
+- [Feature[ Watermarks (Wasserzeichen) for the images
+- [Feature] Trim whitespaces from directory path (flexforms + main class)
+- [Feature] External controls no possible
+- [Feature] Hook added in function addImage()
+- [Feature] Cropscale with the images possible
+- [Feature] Multilanguage support at "open image" title tag
+- [Feature] Sorting of files in mode "Images from directory] Already worked
+- [Feature] DAM categories with recursive levels
+- [Feature] Include extension rgfolderselector to choose a folder with a wizard
+- [Misc] New Icon Set
+- [Bug] in pi1/locallang.xml
+- [Bug] Short open Tag fixed
+- [Bug] DAM categories works now with limitation
+
+1.0.5.
+- [Bug] A small Bug concerning "Images from Dam"
+- [Bug] Bug concerncing the limitation of images solved
+
+1.0.4.
+- [Feature] Check if static TS included (fool proof)
+- [Feature] Check for correct timer duration (fool proof)
+- [Feature] Check for activated javascript and set a single image if not
+- [Feature] Limit number of images selected
+- [Feature] Works now with DAM categories - thx Tobi
+- [Feature] Show title & description of tt_news inside of SmoothGallery
+- [Feature] No empty tags (p & h3) because tidy doesn't like it
+- [Bug] Changed names flexformDAM_ds.xml <-> flexform_ds.xml
+- [Misc] Update of manual
+- [Misc] Code cleaning
+
+1.0.3.
+- [Bug] Sorry guys ;)
+
+1.0.2.
+- [Feature] Integration into tt_news
+- [Feature] SmoothGallery v.1.2
+- [Feature] Check for missing / at the end of file directory
+- [Feature] Changeable paths to CSS-Files
+- [Feature] Hide Thumbnails if an image is chosen or user klicks on the next/prev-button
+- [Bug] Works now with pmkslimbox, see manual not solved yet, sorry
+
+1.0.1.
+- [Bug] Get description & title from record
+
+1.0.0.
+- First Release

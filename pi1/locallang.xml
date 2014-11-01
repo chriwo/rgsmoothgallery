@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>module</type>
+		<description>Language labels for plugin &quot;tx_rgsmoothgallery_pi1&quot;</description>
+	</meta>
+	<data type="array">
+	 <!-- Default -->
+		<languageKey index="default" type="array">
+			<label index="textShowCarousel">Pictures</label>
+			<label index="errorIncludeStatic">Error! Please inlcude the TS in an ext.template. Take a look at the manual http://typo3.org/extensions/repository/view/rgsmoothgallery/1.0.3/ > Users manual</label>			
+			<label index="textOpenImage">Open Image</label>	
+  		
+		</languageKey>
+		
+	 <!-- German -->
+		<languageKey index="de" type="array">
+			<label index="textShowCarousel">Thumbnails</label>
+			<label index="errorIncludeStatic">Fehler! Es wurde vergessen das TS der Extension einzubinden! Ein Blick ins manual genügt: http://typo3.org/extensions/repository/view/rgsmoothgallery/1.0.3/ > Users manual</label>
+			<label index="textOpenImage">Bild vergrößern</label>
+		</languageKey>
+
+	<!--Dutch -->
+		<languageKey index="nl" type="array">
+			<label index="textShowCarousel">Thumbnails</label>
+			<label index="errorIncludeStatic">Fout! Voeg svp de TS in. Bekijk de handleiding: http://typo3.org/extensions/repository/view/rgsmoothgallery/1.2.0/ > Users manual</label>
+			<label index="textOpenImage">Vergroot de afbeelding</label>
+		</languageKey>
+
+		<!-- French -->
+		<languageKey index="fr" type="array">
+			<label index="textShowCarousel">Images</label>
+			<label index="errorIncludeStatic">Erreur ! Veuillez inclure le TS dans l'extension. Jetez un oeil au manuel : http://typo3.org/extensions/repository/view/rgsmoothgallery/1.0.3/ > Users manual</label>			
+			<label index="textOpenImage">Agrandir l'image</label>
+			<label index="authorWrap">(photo de |)</label>
+		</languageKey>
+
+	</data>
+</T3locallang>

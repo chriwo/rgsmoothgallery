@@ -1,0 +1,17 @@
+plugin.tx_rgsmoothgallery {
+# cat=SmoothGallery/Settings/;type=text; label= Settings for SmoothGallery
+settings = timed:false,showArrows: true,showCarousel: true,embedLinks:true,lightbox:true,textShowCarousel:'Thumbnails'
+
+# cat=SmoothGallery/Sizes/;type=text; label= Max Width for lightbox in tt_content
+lightboxWidth = 700
+
+# cat=SmoothGallery/Sizes/;type=text; label= Max Height for lightbox in tt_content
+lightboxHeight = 700
+
+# cat=SmoothGallery/Sizes/;type=text; label= Max Width for thumbnails in tt_content
+thumbWidth = 100
+
+# cat=SmoothGallery/Sizes/;type=text; label= Max Height for thumbnails in tt_content
+thumbHeight = 75
+
+}

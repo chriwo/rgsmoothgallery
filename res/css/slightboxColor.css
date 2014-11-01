@@ -1,0 +1,125 @@
+/* SLIGHTBOX */
+/* variation on SLIMBOX */
+
+#rglbOverlay {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	background-color: #333;
+	cursor: pointer;
+	z-index: 15;
+}
+
+#rglbCenter, #rglbBottom {
+	position: absolute;
+	left: 50%;
+	overflow: hidden;
+	background-color: #012138;
+	z-index: 20;
+	border: 1px solid #006699;
+}
+
+#rglbCenter {
+	padding: 10px;
+}
+
+.rglbLoading {
+	background: #012138 url('img/loading-bar-black2.gif') no-repeat center;
+	border: 1px solid #666;
+}
+
+#rglbImage {
+	z-index: 25;
+}
+
+
+#rglbPrevLink, #rglbNextLink {
+	position: absolute;
+	cursor: pointer;
+	background: tranparent;
+	z-index:12;
+
+
+}
+
+
+
+#rglbPrevLink
+{
+
+	bottom:10px;
+right:40px;
+	margin: 5px;
+	height: 13px;
+	width: 13px;
+	background: url('img/left.gif') no-repeat bottom left;
+
+}
+
+
+
+#rglbNextLink {
+	right: 20px;
+	bottom:10px;
+	margin: 5px;
+	height: 13px;
+	width: 13px;
+	background: url('img/right.gif') no-repeat bottom right;
+
+}
+
+
+#rglbBottom {
+	font-family: Verdana, Helvetica, sans-serif;
+	font-size: 10px;
+	line-height: 1.4em;
+	text-align: left;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-top-style: none;
+}
+
+#rglbCloseLink {
+	display: block;
+	float: right;
+	width: 13px;
+	height: 13px;
+	background: transparent url('img/close.gif') no-repeat center;
+	margin-top: 5px;
+}
+
+#rglbNumber {
+	display: block;
+	float: left;color:#999;
+}
+
+#rglbNumber.gallery {
+	display: block;
+	float: left;
+	padding: 10px;
+}
+
+#rglbCaption {
+	margin-left: 10px;
+	display: block;
+	float: left;
+
+}
+
+#rglbDescription {
+	float: left;
+	padding-right: 10px;
+}
+
+#rglbDescription #rglbTitle {
+	float: left;
+	clear: both;
+	font-weight: bold;
+color:#999;
+}
+
+#rglbDescription #rglbCaption {
+	margin-left: 0;
+color:#999;
+}
+

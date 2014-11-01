@@ -1,0 +1,134 @@
+/* SLIGHTBOX */
+/* variation on SLIMBOX */
+
+#rglbOverlay {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	background-color: #000;
+	cursor: pointer;
+	z-index: 15;
+}
+
+#rglbCenter, #rglbBottom {
+	position: absolute;
+	left: 50%;
+	overflow: hidden;
+	background-color: #000;
+	z-index: 20;
+	border: 1px solid #666;
+}
+
+#rglbCenter {
+	padding: 10px;
+}
+
+.rglbLoading {
+	background: #fff url('img/loading-bar-black.gif') no-repeat center;
+	border: 1px solid #666;
+}
+
+#rglbImage {
+	z-index: 25;
+}
+
+#rglbPrevLink, #rglbNextLink {
+	display: block;
+	position: absolute;
+	top: 0;
+	width: 50%;
+	outline: none;
+	z-index: 26;
+}
+
+#rglbPrevLink {
+	left: 0;
+}
+
+#rglbPrevLink:hover {
+	background: transparent url('img/fleche1.png') no-repeat 0% 50%;
+}
+
+* html #rglbPrevLink:hover { background: transparent url('img/fleche1.gif') no-repeat 0% 50%; }
+
+#rglbNextLink {
+	right: 0;
+}
+
+#rglbNextLink:hover {
+	background: transparent url('img/fleche2.png') no-repeat 100% 50%;
+}
+
+* html #rglbNextLink:hover { background: transparent url('img/fleche2.gif') no-repeat 100% 50%; }
+
+#rglbBottom {
+	font-family: Verdana, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #666;
+	line-height: 1.4em;
+	text-align: left;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-top-style: none;
+}
+
+#rglbCloseLink {
+	display: block;
+	float: right;
+	width: 80px;
+	height: 30px;
+	background: transparent url('img/close9yj.gif') no-repeat center;
+	margin-bottom: 10px;
+}
+
+#rglbNumber {
+	display: block;
+	float: left;
+}
+
+#rglbNumber.gallery {
+	display: block;
+	float: left;
+	padding: 10px;
+}
+
+#rglbCaption {
+	margin-left: 10px;
+	display: block;
+	float: left;
+}
+
+#rglbDescription {
+	float: left;
+	padding-right: 10px;
+}
+
+#rglbDescription #rglbTitle {
+	float: left;
+	clear: both;
+	font-weight: bold;
+}
+
+#rglbDescription #rglbCaption {
+	margin-left: 0;
+}
+
+#rglbPrintLink {
+	display: block;
+	float: right;
+	width: 22px;
+	height: 22px;
+	background: transparent url(img/printer.png) no-repeat center;
+	margin:0 5px 0 0; 
+  padding:1px;
+}
+
+#rglbSaveLink {
+	display: block;
+	float: right;
+	width: 22px;
+	height: 22px;
+	background: transparent url(img/disk.png) no-repeat center;
+	margin:0 5px 0 0; 
+  padding:1px;
+}

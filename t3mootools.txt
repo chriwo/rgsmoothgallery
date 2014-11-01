@@ -1,0 +1,2 @@
+script=res/scripts/jd.gallery1010.js,res/scripts/slightbox107.js,
+components=Window.DomReady
